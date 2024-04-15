@@ -69,7 +69,7 @@ end
 % ************************************************************************
 function [data,dt,locs,spikethreshold] = findspikes(data,dt)
 
-minSpikeHeight = -10; % mV
+minSpikeHeight = 0; % mV
 spikeVelocity = 10; % 10 mV/msec
 t = (1:length(data))*dt - dt;
 % dt = dt/10;
@@ -82,7 +82,7 @@ if max(data)<minSpikeHeight
 end
 [~,locs] = ...
     findpeaks(data,'MinPeakHeight',minSpikeHeight,...
-    'MinPeakDistance',round(5/dt),'MaxPeakWidth',round(10/dt),...
+    'MinPeakDistance',round(5/dt),'MaxPeakWidth',round(5/dt),...
     'MinPeakProminence',30);
 dvdt = gradient(data,dt);
 dvdt(1:locs(1)-round(3/dt)) = 0;
