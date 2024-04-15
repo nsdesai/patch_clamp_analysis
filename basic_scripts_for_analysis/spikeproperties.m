@@ -28,7 +28,7 @@ function [spikethreshold,spikeamplitude,spikewidth,spikelatency,spikepeak,upstro
 % Written           Niraj S. Desai (NSD), 12/28/21
 
 spikeVelocity = 10; % 10 mV/msec
-minSpikeHeight = -10; % minimum absolute spike height
+minSpikeHeight = 0; % minimum absolute spike height
 
 dt = 1000/Pars.sampleRate; % time step in msec
 data = inputData(startLoc:stopLoc,rheobaseIdx);
@@ -39,7 +39,7 @@ data = interp1(t,data,t1);
 
 [pks,locs] = ...
     findpeaks(data,'MinPeakHeight',minSpikeHeight,...
-    'MinPeakDistance',round(5/dt),'MaxPeakWidth',round(10/dt),...
+    'MinPeakDistance',round(5/dt),'MaxPeakWidth',round(5/dt),...
     'MinPeakProminence',30);
 spikepeak = pks(1);
 spikelatency = locs(1)*dt;
@@ -58,7 +58,7 @@ foo = find(diff(data1));
 spikewidth = (foo(2)-foo(1))*dt;
 
 % upstroke and downstroke
-upIdx = locs(1)-round(5/dt);
+upIdx = max(locs(1)-round(5/dt),1);
 downIdx = max(locs(1)-round(20/dt),length(dvdt));
 dvdt1 = dvdt(upIdx:downIdx);
 upstroke = max(dvdt1);

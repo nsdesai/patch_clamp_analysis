@@ -1,4 +1,4 @@
-function [sag,sagRatio] = sagpotential(inputData,outputData,Pars,startLoc,stopLoc,sagCurrent)
+function [sag,sagRatio,tauSag] = sagpotential(inputData,outputData,Pars,startLoc,stopLoc,sagCurrent)
 % [sag,sagRatio] = sagpotential(inputData,outputData,Pars,sagCurrent,startLoc,stopLoc,sagCurrent)
 %
 % calculates the absolute sag potential from hyperpolarizing current steps
@@ -68,10 +68,25 @@ end
 data = inputData(:,idx);
 data = medfilt1(data,round(20/dt)); % smooth noise > 20 Hz
 base = mean(data(startLoc-round(20/dt):startLoc-round(1/dt)));
-minX = min(data(startLoc:startLoc+round((stopLoc-startLoc)/2)));
+[minX,minIdx] = min(data(startLoc:startLoc+round((stopLoc-startLoc)/2)));
 ssX = max(data(startLoc+round((stopLoc-startLoc)/2):stopLoc-1));
 sag = ssX - minX;
 sagRatio = (minX-base)/(ssX-base);
 if sag<0
     sag=0;
 end
+
+r = data(startLoc+minIdx+round(5/dt):stopLoc);
+r = abs(r - mean(r(end-round(20/dt):end)));
+r1 = median(r(1:3));
+g = fittype('a*exp(-b*x)');
+t = (1:length(r))*dt - dt;
+f0 = fit(t(:),r(:)/r1,g,'StartPoint',[1,1/50]);
+tauSag = 1/f0.b;
+if r1 < 3
+    tauSag = 0;
+end
+
+
+
+

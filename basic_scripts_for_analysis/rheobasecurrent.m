@@ -23,7 +23,7 @@ function [rheobase,rheobaseIdx] = rheobasecurrent(inputData,outputData,Pars,star
 
 warning off
 
-minSpikeHeight = -10;
+minSpikeHeight = 0; % spikes must be overshooting
 dt = 1000/Pars.sampleRate;
 
 steps = outputData(stopLoc,:);
@@ -39,7 +39,7 @@ for ii = 1:nSteps
     end
     pks = ...
         findpeaks(r,'MinPeakHeight',minSpikeHeight,...
-        'MinPeakDistance',round(5/dt),'MaxPeakWidth',round(10/dt),...
+        'MinPeakDistance',round(5/dt),'MaxPeakWidth',round(5/dt),...
         'MinPeakProminence',30);
     if isempty(pks)
         continue

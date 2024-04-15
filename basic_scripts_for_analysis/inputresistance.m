@@ -77,27 +77,12 @@ end
 steps(isnan(Vss)) = [];
 Vss(isnan(Vss)) = [];
 
-% % fit a straight line to Vss vs current steps
-% warning off
-% if numel(steps)>1
-%     p = polyfit(steps,Vss,1);
-% else
-%     p = Vss(1)/steps(1);
-% end
-% Rn = 1000*p(1); % MOhms
-% warning on
-
 % fit a straight line to Vss vs current steps
 warning off
-p = polyfit(steps,Vss,1);
-Rn = abs(1000*p(1)); % MOhms
-warning on
-
-try
-    idx = find(steps==-20,1);
-    Vss = Vss(idx);
-    Rn = abs(1000*Vss/20);
-catch
-    % nothing
+if numel(steps)>1
+    p = polyfit(steps,Vss,1);
+else
+    p = Vss(1)/steps(1);
 end
-
+Rn = 1000*p(1); % MOhms
+warning on

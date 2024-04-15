@@ -31,12 +31,12 @@ dt = 1000/Pars.sampleRate;
 
 [~,idx] = max(nPeaks);
 
-minSpikeHeight = -10;
+minSpikeHeight = 0;
 
 data = inputData(startLoc:stopLoc,idx);
 [~,loc] = ...
     findpeaks(data,'MinPeakHeight',minSpikeHeight,...
-    'MinPeakDistance',round(5/dt),'MaxPeakWidth',round(10/dt),...
+    'MinPeakDistance',round(5/dt),'MaxPeakWidth',round(5/dt),...
     'MinPeakProminence',30);
 
 len = length(data);

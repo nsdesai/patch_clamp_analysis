@@ -22,7 +22,7 @@ function [fislope,maxfiringrate,nPeaks] = ficurve(inputData,outputData,Pars,...
 %
 % Written           Niraj S. Desai (NSD), 12/29/21
 
-minSpikeHeight = -10;
+minSpikeHeight = 0;
 
 dt = 1000/Pars.sampleRate; % time step in msec
 
@@ -39,7 +39,7 @@ for ii = 1:nSteps
     end
     pks = ...
         findpeaks(r,'MinPeakHeight',minSpikeHeight,...
-        'MinPeakDistance',round(5/dt),'MaxPeakWidth',round(10/dt),...
+        'MinPeakDistance',round(5/dt),'MaxPeakWidth',round(5/dt),...
         'MinPeakProminence',30);
     if isempty(pks)
         continue

@@ -1,24 +1,30 @@
 function analyzedData = analysis_of_neurophysiology_data(folderName)
+% run analysis on all recording files in the folder called folderName
+% return table of analysis measurements
+%
+% INPUT
+% folderName        complete name of folder containing recordings to be
+%                   analyzed
+% OUTPUT
+% analyzedData      table containing analysis measurements
+% 
+% Last modified: 04/15/24 (NSD)
 
-oldDir = cd(folderName);
-
-sagCurrent = -60; % pA
-analysisDuration = 500; % msec 
+sagCurrent = -60; % use the -60 pA current step to measure sag potential
+analysisDuration = 500; % analyze only the first 500 msec of the current step
 
 analyzedData = table;
 
 % find the data files and get the numbers identifying each recording; 
 % in some cases, data from a single recording are spread over more than one
 % file
-% files = dir('*experiment*.mat');
-% for ii = 1:numel(files)
-%     filename = files(ii).name;
-%     foo = strfind(filename,'experiment');
-%     recordingNumbers(ii) = str2double(filename(foo+10:foo+12)); 
-% end
-% recordingNumbers = unique(recordingNumbers);
-files = dir('*.mat');
-recordingNumbers = 1:numel(files);
+files = dir([folderName,filesep,'experiment*.mat']);
+for ii = 1:numel(files)
+    filename = files(ii).name;
+    foo = strfind(filename,'experiment');
+    recordingNumbers(ii) = str2double(filename(foo+10:foo+12)); 
+end
+recordingNumbers = unique(recordingNumbers);
 
 
 for ii = 1:numel(recordingNumbers)
@@ -26,18 +32,16 @@ for ii = 1:numel(recordingNumbers)
     % get all data files associated with current recording number &
     % concatentate them if there is more than one
     recordingNo = recordingNumbers(ii);
-%     files = dir(['*experiment',num2str(recordingNo,'%03.0f'),'*.mat']);
-    files = dir(['*.mat']);
+    files = dir([folderName,filesep,'experiment',num2str(recordingNo,'%03.0f'),'*.mat']);
     inputData = []; outputData = [];
-%     for jj = 1:numel(files)
-%         files(jj).name
-%         foo = load(files(jj).name,'inputData','outputData','Pars');
-%         inputData = [inputData, foo.inputData]; %#ok<*AGROW>
-%         foo.outputData = foo.outputData(:,foo.Pars.orderOfSteps);
-%         outputData = [outputData, foo.outputData];
-%         Pars = foo.Pars;
-%     end
-    load(files(ii).name,'inputData','outputData','Pars')
+    for jj = 1:numel(files)
+        foo = load(files(jj).name,'inputData','outputData','Pars');
+        inputData = [inputData, foo.inputData]; %#ok<*AGROW>
+        foo.outputData = foo.outputData(:,foo.Pars.orderOfSteps);
+        outputData = [outputData, foo.outputData];
+        Pars = foo.Pars;
+    end
+    cellID{ii} = files(1).name; %#ok<*AGROW> 
 
     out.time = Pars.time;
     out.eNo = Pars.experimentNo;
@@ -106,6 +110,7 @@ for ii = 1:numel(recordingNumbers)
     
 end
 
+analyzedData.cellID = cellID(:);
 features = fieldnames(results);
 for jj = 1:numel(features)
     fStr = features{jj};
@@ -120,5 +125,3 @@ for jj = 1:numel(features)
     end
     analyzedData.(fStr) = values;
 end
-
-cd(oldDir)
